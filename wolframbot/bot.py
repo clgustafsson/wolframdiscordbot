@@ -2,6 +2,17 @@ import discord
 import os
 import wolframalpha
 
+def bftranslator(bf):
+    list = bf.split("(")
+    list2 = list[1].split("/")
+    fn = int(list[0])*int(list2[1])
+    rft = fn+ int(list2[0])
+    rfn = list2[1]
+    rf = "("+str(rft)+"/"+str(rfn)+")"
+    return rf
+
+print(bftranslator("4(1/2"))
+
 keys = open('../keys.txt', 'r').read()
 keylist = keys.split(",")
 
@@ -20,6 +31,9 @@ async def on_message(message):
  
    if message.content.startswith('!wolfram'):
        question = message.content[8:]   
+       if "bf" in question:
+           #in work
+           bftranslator
        await message.channel.send("Question: " + str(question))
        res = clientwolfram.query(question)
        answer = next(res.results).text
