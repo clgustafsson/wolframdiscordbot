@@ -25,8 +25,16 @@ def findendpindex(start, string):
                 return endi
     return -1
 
+def bf(question):
+    while "bf" in question:
+        start = question.index("bf")
+        replacestring = (bftranslator(question[start +2:findendpindex(start + 4, question)]))
+        sub1 = question[:start]
+        sub2 = question[findendpindex(start + 4, question)+1:]
+        question = sub1 + replacestring + sub2
+    return question
 
-print(bftranslator("4(1/2"))
+
 
 keys = open('keys.txt', 'r').read()
 keylist = keys.split(",")
@@ -46,15 +54,14 @@ async def on_message(message):
  
    if message.content.startswith('!wolfram'):
        question = message.content[8:]   
-       if "bf" in question:
-           
-           bftranslator
+       question = bf(question)
        await message.channel.send("Question: " + str(question))
        res = client_wolfram.query(question)
        answer = next(res.results).text
        await message.channel.send("Answer: " + str(answer))
    elif message.content.startswith('!imagewolfram'):
        question = message.content[13:]  
+       question = bf(question)
        async with aiohttp.ClientSession() as session:
             async with session.get("https://api.wolframalpha.com/v1/simple?appid="+ str(app_id_wolfram) +"&i="+ str(question.replace(" ", "+")) + "%3F") as resp:
                 if resp.status != 200:
@@ -64,6 +71,6 @@ async def on_message(message):
 
 
    elif '!help' in message.content:
-       await message.channel.send('use format !wolfram {question} in standard wolfram format')
+       await message.channel.send('use format !wolfram {question} in standard wolfram format to get text answer \nuse format !imagewolfram {question} in standard wolfram format to get full image answer\nuse format bf{num}({num}/{num}) to use mixed form')
 
 client.run(keylist[1]) 
