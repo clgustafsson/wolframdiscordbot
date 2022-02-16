@@ -53,6 +53,14 @@ async def on_message(message):
        res = client_wolfram.query(question)
        answer = next(res.results).text
        await message.channel.send("Answer: " + str(answer))
+   elif message.content.startswith('!imagewolfram'):
+       question = message.content[13:]  
+       async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.wolframalpha.com/v1/simple?appid="+ str(app_id_wolfram) +"&i="+ str(question.replace(" ", "+")) + "%3F") as resp:
+                if resp.status != 200:
+                    return await message.channel.send('Could not download file...')
+                data = io.BytesIO(await resp.read())
+                await message.channel.send(file=discord.File(data, 'results.png'))
 
 
    elif '!help' in message.content:
