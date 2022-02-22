@@ -4,7 +4,7 @@ import wolframalpha
 import io
 import aiohttp
 
-def bftranslator(bf):
+def mixed_form_translator(bf):
     list = bf.split("(")
     list2 = list[1].split("/")
     fn = int(list[0])*int(list2[1])
@@ -14,7 +14,7 @@ def bftranslator(bf):
     return rf
 
 
-def findendpindex(start, string):
+def find_end_p_index(start, string):
     counter = 1
     for endi in range(start, len(string)):
         if (string[endi] == '('):
@@ -25,15 +25,18 @@ def findendpindex(start, string):
                 return endi
     return -1
 
-def bf(question):
+def reformat_question(question):
     while "bf" in question:
         start = question.index("bf")
-        replacestring = (bftranslator(question[start +2:findendpindex(start + 4, question)]))
+        replacestring = (mixed_form_translator(question[start +2:find_end_p_index(start + 4, question)]))
         sub1 = question[:start]
-        sub2 = question[findendpindex(start + 4, question)+1:]
+        sub2 = question[find_end_p_index(start + 4, question)+1:]
         question = sub1 + replacestring + sub2
     return question
 
+def wolfram_text_answer(question):
+    res = client_wolfram.query(question)
+    return next(res.results).text
 
 
 keys = open('keys.txt', 'r').read()
@@ -54,14 +57,13 @@ async def on_message(message):
  
    if message.content.startswith('!wolfram'):
        question = message.content[8:]   
-       question = bf(question)
+       question = reformat_question(question)
        await message.channel.send("Question: " + str(question))
-       res = client_wolfram.query(question)
-       answer = next(res.results).text
+       answer = wolfram_text_answer(question)
        await message.channel.send("Answer: " + str(answer))
    elif message.content.startswith('!imagewolfram'):
        question = message.content[13:]  
-       question = bf(question)
+       question = reformat_question(question)
        async with aiohttp.ClientSession() as session:
             async with session.get("https://api.wolframalpha.com/v1/simple?appid="+ str(app_id_wolfram) +"&i="+ str(question.replace(" ", "+")) + "%3F") as resp:
                 if resp.status != 200:
@@ -71,6 +73,6 @@ async def on_message(message):
 
 
    elif '!help' in message.content:
-       await message.channel.send('use format !wolfram {question} in standard wolfram format to get text answer \nuse format !imagewolfram {question} in standard wolfram format to get full image answer\nuse format bf{num}({num}/{num}) to use mixed form')
+       await message.channel.send('use format !wolfram <question> in standard wolfram format to get text answer \nuse format !imagewolfram <question> in standard wolfram format to get full image answer\nuse format bf<num>(<num>/<num>) to use mixed form')
 
 client.run(keylist[1]) 
