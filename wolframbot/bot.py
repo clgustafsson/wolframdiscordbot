@@ -88,16 +88,11 @@ async def on_ready():
 async def on_message(message):
    if message.author == client.user:
        return
- 
-   if message.content.startswith('!wolfram'):
-       question = message.content[8:]   
-       question = reformat_question(question)
-       await message.channel.send("Question: " + str(question))
-       answer = wolfram_text_answer(question)
-       await message.channel.send("Answer: " + str(answer))
-       add_to_history(question, answer)
-       save_history(history_list)
-   elif message.content.startswith('!imagewolfram'):
+   if message.content.startswith('!wolframhistory'):
+       answer = get_history()
+       await message.channel.send(str(answer))
+
+   elif message.content.startswith('!wolframimage'):
        question = message.content[13:]  
        question = reformat_question(question)
        async with aiohttp.ClientSession() as session:
@@ -106,9 +101,16 @@ async def on_message(message):
                     return await message.channel.send('Could not download file...')
                 data = io.BytesIO(await resp.read())
                 await message.channel.send(file=discord.File(data, 'results.png'))
-   elif message.content.startswith('!wolframhistory'):
-       answer = get_history()
-       await message.channel.send(str(answer))
+
+
+   elif message.content.startswith('!wolfram'):
+       question = message.content[8:]   
+       question = reformat_question(question)
+       await message.channel.send("Question: " + str(question))
+       answer = wolfram_text_answer(question)
+       await message.channel.send("Answer: " + str(answer))
+       add_to_history(question, answer)
+       save_history(history_list)
 
    elif '!help' in message.content:
        await message.channel.send(helptext)
