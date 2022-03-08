@@ -77,7 +77,7 @@ def wolfram_text_answer(question):
 keys = open('keys.txt', 'r').read()
 keylist = keys.split(",")
 
-helptext = "use format !wolfram <question> in standard wolfram format to get text answer \nuse format !imagewolfram <question> in standard wolfram format to get full image answer\nuse format bf<num>(<num>/<num>) to use mixed form"
+helptext = "use format !wolfram <question> in standard wolfram format to get text answer \nuse format !imagewolfram <question> in standard wolfram format to get full image answer\nuse format bf<num>(<num>/<num>) to use mixed form\nuse !wolframhistory <lenght> to get history, Only text queries are saved"
 
 client = discord.Client()
 app_id_wolfram = keylist[0]
