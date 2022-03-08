@@ -62,6 +62,13 @@ def reformat_question(question):
         question = sub1 + replacestring + sub2
     return question
 
+def reformat_answer(answer):
+    newanswer = ""
+    for x in range(len(answer[0])):
+        newanswer += "Question: " + str(answer[0][x])+"\nAnswer: " + str(answer[1][x])+"\n"
+    return newanswer
+
+
 def wolfram_text_answer(question):
     res = client_wolfram.query(question)
     return next(res.results).text
@@ -90,8 +97,8 @@ async def on_message(message):
        return
    if message.content.startswith('!wolframhistory'):
        answer = get_history()
-       for x in range(len(answer[0])):
-            await message.channel.send("Question: " + str(answer[0][x])+"\nAnswer: " + str(answer[1][x]))
+       answer = reformat_answer(answer)
+       await message.channel.send(answer)
 
    elif message.content.startswith('!wolframimage'):
        question = message.content[13:]  
