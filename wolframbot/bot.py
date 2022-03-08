@@ -91,7 +91,7 @@ async def on_message(message):
    if message.content.startswith('!wolframhistory'):
        answer = get_history()
        for x in range(len(answer[0])):
-            await message.channel.send("Question: " + str(answer[0][x])+"\nAnser: " + str(answer[1][x]))
+            await message.channel.send("Question: " + str(answer[0][x])+"\nAnswer: " + str(answer[1][x]))
 
    elif message.content.startswith('!wolframimage'):
        question = message.content[13:]  
