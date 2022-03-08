@@ -31,6 +31,12 @@ def save_history(history_list):
     with open("history.json", 'w') as history_file:
         history_file.write(str(history_list))
 
+def clear_history():
+    empty_history = [[],[]]
+    history_list[0].clear()
+    history_list[1].clear()
+    save_history(empty_history)
+
 
 def mixed_form_translator(bf):
     list = bf.split("(")
@@ -99,7 +105,11 @@ async def on_message(message):
        answer = get_history()
        answer = reformat_answer(answer)
        await message.channel.send(answer)
-
+    
+   elif message.content.startswith('!wolframclearhistory'):
+      clear_history()
+      await message.channel.send("Successfully cleared!")
+        
    elif message.content.startswith('!wolframimage'):
        question = message.content[13:]  
        question = reformat_question(question)
