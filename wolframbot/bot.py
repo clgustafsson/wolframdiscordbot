@@ -3,6 +3,34 @@ import os
 import wolframalpha
 import io
 import aiohttp
+import json
+import ast
+
+def load_history():
+    return get_history(100, False)
+
+def add_to_history(question, answer):
+
+    question_history.append(str(question))
+    answer_history.append(str(answer))
+
+def get_history(lenght = 100, flip = True):
+    with open("history.json", 'r') as history_file:
+        content = history_file.read()
+        history_list = ast.literal_eval(content)
+        if len(history_list[0]) < lenght or len(history_list[0]) < lenght:
+            lenght = len(history_list[0])
+        if flip:
+            history_list[0] = history_list[0][::-1]
+            history_list[1] = history_list[1][::-1]
+        history_list[0] = history_list[0][:lenght:]
+        history_list[1] = history_list[1][:lenght:]
+        return history_list
+
+def save_history(history_list):
+    with open("history.json", 'w') as history_file:
+        history_file.write(str(history_list))
+
 
 def mixed_form_translator(bf):
     list = bf.split("(")
@@ -47,6 +75,10 @@ helptext = "use format !wolfram <question> in standard wolfram format to get tex
 client = discord.Client()
 app_id_wolfram = keylist[0]
 client_wolfram = wolframalpha.Client(app_id_wolfram)
+
+history_list = load_history()
+question_history = history_list[0]
+answer_history = history_list[1]
  
 @client.event
 async def on_ready():
@@ -63,6 +95,8 @@ async def on_message(message):
        await message.channel.send("Question: " + str(question))
        answer = wolfram_text_answer(question)
        await message.channel.send("Answer: " + str(answer))
+       add_to_history(question, answer)
+       save_history(history_list)
    elif message.content.startswith('!imagewolfram'):
        question = message.content[13:]  
        question = reformat_question(question)
@@ -72,7 +106,9 @@ async def on_message(message):
                     return await message.channel.send('Could not download file...')
                 data = io.BytesIO(await resp.read())
                 await message.channel.send(file=discord.File(data, 'results.png'))
-
+   elif message.content.startswith('!wolframhistory'):
+       answer = get_history()
+       await message.channel.send(str(answer))
 
    elif '!help' in message.content:
        await message.channel.send(helptext)
