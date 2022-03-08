@@ -42,6 +42,8 @@ def wolfram_text_answer(question):
 keys = open('keys.txt', 'r').read()
 keylist = keys.split(",")
 
+helptext = "use format !wolfram <question> in standard wolfram format to get text answer \nuse format !imagewolfram <question> in standard wolfram format to get full image answer\nuse format bf<num>(<num>/<num>) to use mixed form"
+
 client = discord.Client()
 app_id_wolfram = keylist[0]
 client_wolfram = wolframalpha.Client(app_id_wolfram)
@@ -73,6 +75,6 @@ async def on_message(message):
 
 
    elif '!help' in message.content:
-       await message.channel.send('use format !wolfram <question> in standard wolfram format to get text answer \nuse format !imagewolfram <question> in standard wolfram format to get full image answer\nuse format bf<num>(<num>/<num>) to use mixed form')
+       await message.channel.send(helptext)
 
 client.run(keylist[1]) 
