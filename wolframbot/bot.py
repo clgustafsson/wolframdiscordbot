@@ -79,6 +79,14 @@ def wolfram_text_answer(question):
     res = client_wolfram.query(question)
     return next(res.results).text
 
+async def wolfram_image_answer(question):
+    async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.wolframalpha.com/v1/simple?appid="+ str(app_id_wolfram) +"&i="+ str(question.replace(" ", "+")) + "%3F") as resp:
+                if resp.status != 200:
+                   print('Could not download file...')
+                data = io.BytesIO(await resp.read())
+                return data
+
 
 keys = open('keys.txt', 'r').read()
 keylist = keys.split(",")
@@ -116,12 +124,10 @@ async def on_message(message):
    elif message.content.startswith('!wolframimage'):
        question = message.content[13:]  
        question = reformat_question(question)
-       async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.wolframalpha.com/v1/simple?appid="+ str(app_id_wolfram) +"&i="+ str(question.replace(" ", "+")) + "%3F") as resp:
-                if resp.status != 200:
-                    return await message.channel.send('Could not download file...')
-                data = io.BytesIO(await resp.read())
-                await message.channel.send(file=discord.File(data, 'results.png'))
+       data = wolfram_image_answer(question)
+       await message.channel.send(file=discord.File(await data, 'results.png'))
+       add_to_history(question, "(imageanswer)")
+       save_history(history_list)
 
 
    elif message.content.startswith('!wolfram'):
