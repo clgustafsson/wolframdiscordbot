@@ -102,7 +102,10 @@ async def on_message(message):
    if message.author == client.user:
        return
    if message.content.startswith('!wolframhistory'):
-       answer = get_history()
+       lenght = 100
+       if len(message.content) > 15:
+           lenght = int(message.content[15:])    
+       answer = get_history(lenght)
        answer = reformat_answer(answer)
        await message.channel.send(answer)
     
