@@ -18,7 +18,7 @@ def get_history(lenght = 100, flip = True):
     with open("history.json", 'r') as history_file:
         content = history_file.read()
         history_list = ast.literal_eval(content)
-        if len(history_list[0]) < lenght or len(history_list[0]) < lenght:
+        if len(history_list[0]) < lenght or len(history_list[1]) < lenght:
             lenght = len(history_list[0])
         if flip:
             history_list[0] = history_list[0][::-1]
@@ -68,7 +68,13 @@ def reformat_question(question):
         question = sub1 + replacestring + sub2
     return question
 
-def reformat_answer(answer):
+def find_history_lenght(message):
+       lenght = 100
+       if len(message) > 15:
+           lenght = int(message[15:])  
+       return lenght
+
+def reformat_history_answer(answer):
     newanswer = ""
     for x in range(len(answer[0])):
         newanswer += "Question: " + str(answer[0][x])+"\nAnswer: " + str(answer[1][x])+"\n"
@@ -110,11 +116,9 @@ async def on_message(message):
    if message.author == client.user:
        return
    if message.content.startswith('!wolframhistory'):
-       lenght = 100
-       if len(message.content) > 15:
-           lenght = int(message.content[15:])    
+       lenght = find_history_lenght(message.content)
        answer = get_history(lenght)
-       answer = reformat_answer(answer)
+       answer = reformat_history_answer(answer)
        await message.channel.send(answer)
     
    elif message.content.startswith('!wolframclearhistory'):
